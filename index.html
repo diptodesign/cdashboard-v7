@@ -4,114 +4,271 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Clify Cloud - Login</title>
-    <link rel="stylesheet" href="style.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #0A0F1C, #1C2238);
+            color: white;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 450px;
+            width: 100%;
+        }
+        
+        .logo {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .logo-icon {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #c1f11d, #a0d116);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+            font-weight: bold;
+            color: #0A0F1C;
+            margin: 0 auto 15px;
+            box-shadow: 0 10px 30px rgba(193, 241, 29, 0.3);
+        }
+        
+        .logo h1 {
+            font-size: 32px;
+            margin-bottom: 5px;
+            background: linear-gradient(135deg, #fff, #B0B7C3);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .logo p {
+            color: #B0B7C3;
+            font-size: 14px;
+        }
+        
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            background: rgba(255,255,255,0.05);
+            padding: 5px;
+            border-radius: 12px;
+        }
+        
+        .tab {
+            flex: 1;
+            padding: 12px;
+            background: transparent;
+            border: none;
+            color: #B0B7C3;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        
+        .tab.active {
+            background: #c1f11d;
+            color: #0A0F1C;
+        }
+        
+        .form-container {
+            background: rgba(255,255,255,0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 16px;
+            padding: 30px;
+            margin-bottom: 20px;
+        }
+        
+        .form {
+            display: none;
+        }
+        
+        .form.active {
+            display: block;
+            animation: fadeIn 0.5s;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .form h2 {
+            margin-bottom: 20px;
+            color: white;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            color: #B0B7C3;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+        
+        input {
+            width: 100%;
+            padding: 14px;
+            background: rgba(0,0,0,0.3);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 8px;
+            color: white;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+        
+        input:focus {
+            outline: none;
+            border-color: #c1f11d;
+            box-shadow: 0 0 0 3px rgba(193, 241, 29, 0.1);
+        }
+        
+        button {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #c1f11d, #a0d116);
+            border: none;
+            border-radius: 8px;
+            color: #0A0F1C;
+            font-weight: 700;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(193, 241, 29, 0.3);
+        }
+        
+        .error-message {
+            color: #f44336;
+            font-size: 14px;
+            margin-top: 10px;
+            padding: 10px;
+            background: rgba(244, 67, 54, 0.1);
+            border-radius: 8px;
+            text-align: center;
+        }
+        
+        .success-message {
+            color: #4caf50;
+            font-size: 14px;
+            margin-top: 10px;
+            padding: 10px;
+            background: rgba(76, 175, 80, 0.1);
+            border-radius: 8px;
+            text-align: center;
+        }
+        
+        .info-box {
+            background: rgba(193, 241, 29, 0.05);
+            border: 1px solid rgba(193, 241, 29, 0.2);
+            border-radius: 12px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        
+        .info-box code {
+            display: block;
+            padding: 10px;
+            background: #0A0F1C;
+            border-radius: 8px;
+            color: #c1f11d;
+            font-size: 13px;
+            word-break: break-all;
+            margin-top: 10px;
+        }
+        
+        .footer {
+            text-align: center;
+            color: #7A8291;
+            font-size: 12px;
+            margin-top: 20px;
+        }
+        
+        .footer a {
+            color: #c1f11d;
+            text-decoration: none;
+        }
+    </style>
 </head>
 <body>
     <div class="container">
-        <!-- Logo -->
         <div class="logo">
             <div class="logo-icon">C</div>
             <h1>Clify Cloud</h1>
-            <p>Your YouTube blocker, synchronized everywhere</p>
+            <p>Your data, synced everywhere</p>
         </div>
         
-        <!-- Connection Status -->
-        <div class="connection-status" id="connectionStatus">
-            <span class="dot" id="statusDot"></span>
-            <span id="statusText">Checking connection to cloud...</span>
-        </div>
-        
-        <!-- Extension Status -->
-        <div class="extension-status" id="extensionStatus">
-            <span class="ext-dot" id="extDot"></span>
-            <span id="extText">Checking Clify extension...</span>
-        </div>
-        
-        <!-- Tab Navigation -->
         <div class="tabs">
             <button class="tab active" onclick="showTab('login')">Login</button>
-            <button class="tab" onclick="showTab('register')">Create Account</button>
+            <button class="tab" onclick="showTab('register')">Register</button>
         </div>
         
-        <!-- Login Form -->
-        <div id="loginForm" class="form active">
-            <h2>Welcome Back</h2>
-            <p class="form-subtitle">Login to access your dashboard</p>
-            
-            <div class="form-group">
-                <label>Username</label>
-                <input type="text" id="loginUsername" placeholder="Enter your username">
+        <div class="form-container">
+            <!-- Login Form -->
+            <div id="loginForm" class="form active">
+                <h2>Welcome Back</h2>
+                <div class="form-group">
+                    <label>Username</label>
+                    <input type="text" id="loginUsername" placeholder="Enter your username">
+                </div>
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="password" id="loginPassword" placeholder="Enter your password">
+                </div>
+                <button onclick="login()">Login</button>
+                <div id="loginError" class="error-message"></div>
             </div>
             
-            <div class="form-group">
-                <label>Password</label>
-                <input type="password" id="loginPassword" placeholder="Enter your password">
+            <!-- Register Form -->
+            <div id="registerForm" class="form">
+                <h2>Create Account</h2>
+                <div class="form-group">
+                    <label>Username</label>
+                    <input type="text" id="regUsername" placeholder="Choose a username">
+                </div>
+                <div class="form-group">
+                    <label>Password (min 6 characters)</label>
+                    <input type="password" id="regPassword" placeholder="Choose a password">
+                </div>
+                <div class="form-group">
+                    <label>Confirm Password</label>
+                    <input type="password" id="regConfirm" placeholder="Confirm your password">
+                </div>
+                <button onclick="register()">Create Account</button>
+                <div id="registerError" class="error-message"></div>
+                <div id="registerSuccess" class="success-message"></div>
             </div>
-            
-            <button onclick="login()" class="btn-primary">
-                <span>Login</span>
-                <i class="arrow">→</i>
-            </button>
-            
-            <div id="loginError" class="error-message"></div>
         </div>
         
-        <!-- Register Form -->
-        <div id="registerForm" class="form">
-            <h2>Create Account</h2>
-            <p class="form-subtitle">Get your personal dashboard URL</p>
-            
-            <div class="form-group">
-                <label>Username</label>
-                <input type="text" id="regUsername" placeholder="Choose a username">
-            </div>
-            
-            <div class="form-group">
-                <label>Password (min 6 characters)</label>
-                <input type="password" id="regPassword" placeholder="Choose a password">
-            </div>
-            
-            <div class="form-group">
-                <label>Confirm Password</label>
-                <input type="password" id="regConfirm" placeholder="Confirm your password">
-            </div>
-            
-            <button onclick="register()" class="btn-primary">
-                <span>Create Account</span>
-                <i class="arrow">→</i>
-            </button>
-            
-            <div id="registerError" class="error-message"></div>
-            <div id="registerSuccess" class="success-message"></div>
-        </div>
-        
-        <!-- Info Box -->
         <div class="info-box">
-            <div class="info-icon">ℹ️</div>
-            <div class="info-content">
-                <strong>Your personal dashboard URL will be:</strong>
-                <code id="previewUrl">https://diptodesign.github.io/cdashboard-v7/dashboard/YOUR-USER-ID</code>
-                <p class="info-note">After login, you'll get your unique dashboard link</p>
-            </div>
+            <strong>Your dashboard URL will be:</strong>
+            <code id="previewUrl">https://diptodesign.github.io/cdashboard-v7/dashboard/YOUR-USER-ID</code>
         </div>
         
-        <!-- Sync Instructions -->
-        <div class="sync-instructions">
-            <h3>📱 Connect with Clify Extension</h3>
-            <ol>
-                <li>Install Clify extension from Chrome Web Store</li>
-                <li>Click the Clify icon in Chrome toolbar</li>
-                <li>Go to Settings → Cloud Sync</li>
-                <li>Enter your username and password</li>
-                <li>Your blocks will sync automatically!</li>
-            </ol>
-        </div>
-        
-        <!-- Footer -->
         <div class="footer">
-            <p>⚡ Powered by Render.com + MongoDB Atlas</p>
             <p>© 2026 Clify - Dipto Design Studio</p>
-            <p class="small">Extension Version: 7.0.0 | API: Connected</p>
         </div>
     </div>
     
