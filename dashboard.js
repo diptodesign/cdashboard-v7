@@ -3,15 +3,14 @@
 // ============================================
 
 const API_URL = 'https://clify-api.onrender.com';
+const VERSION = "v7.0.0";
 
 // ========== URL HANDLING ==========
 function getUserIdFromUrl() {
-    // Check for ?user=USERID format
     const params = new URLSearchParams(window.location.search);
     const userId = params.get('user');
     if (userId) return userId;
     
-    // Check for /dashboard/USERID format (though 404.html should handle this)
     const path = window.location.pathname;
     const match = path.match(/\/dashboard\/([^\/]+)/);
     if (match) return match[1];
@@ -63,7 +62,6 @@ async function login() {
             errorEl.textContent = 'Login successful! Redirecting...';
             
             setTimeout(() => {
-                // Redirect to dashboard.html with user parameter
                 window.location.href = `/cdashboard-v7/dashboard.html?user=${data.userId}`;
             }, 1500);
         } else {
@@ -109,12 +107,11 @@ async function register() {
         const data = await response.json();
         
         if (data.success) {
-            successEl.textContent = 'Account created successfully! Redirecting...';
+            successEl.textContent = 'Account created! Redirecting...';
             localStorage.setItem('token', data.token);
             localStorage.setItem('userId', data.userId);
             localStorage.setItem('username', data.username);
             
-            // FIXED: Redirect to dashboard.html with user parameter
             setTimeout(() => {
                 window.location.href = `/cdashboard-v7/dashboard.html?user=${data.userId}`;
             }, 1500);
@@ -142,11 +139,13 @@ async function loadDashboardData() {
         return;
     }
     
-    // Update UI with user info
-    document.getElementById('welcomeMessage').textContent = `Welcome, ${username || 'User'}!`;
+    document.getElementById('displayName').textContent = username || 'User';
+    document.getElementById('username').textContent = username || 'User';
     document.getElementById('userId').textContent = userId;
     
-    // Load data from API
+    const dashboardUrl = window.location.href;
+    document.getElementById('dashboardUrl').textContent = dashboardUrl;
+    
     try {
         const response = await fetch(`${API_URL}/api/data/${userId}`, {
             headers: token ? { 'Authorization': `Bearer ${token}` } : {}
@@ -157,13 +156,11 @@ async function loadDashboardData() {
         if (result.success && result.data) {
             displayDashboardData(result.data);
         } else {
-            document.getElementById('totalBlocks').textContent = '0';
-            document.getElementById('keywordsCount').textContent = '0';
+            document.getElementById('recentVideos').innerHTML = '<div class="loading">No data found</div>';
         }
     } catch (error) {
         console.error('Failed to load data:', error);
-        document.getElementById('totalBlocks').textContent = '0';
-        document.getElementById('keywordsCount').textContent = '0';
+        document.getElementById('recentVideos').innerHTML = '<div class="loading">Failed to load data</div>';
     }
 }
 
@@ -171,13 +168,66 @@ function displayDashboardData(data) {
     // Update stats
     const videos = Object.keys(data.blockedVideos || {}).length;
     const keywords = (data.keywords || []).length;
+    const shorts = Object.values(data.blockedVideos || {}).filter(v => v?.reason === 'shorts').length;
     
     document.getElementById('totalBlocks').textContent = videos;
     document.getElementById('keywordsCount').textContent = keywords;
+    document.getElementById('shortsCount').textContent = shorts;
+    document.getElementById('videoCount').textContent = videos;
+    document.getElementById('keywordCount').textContent = keywords;
     
     if (data.lastSync) {
-        document.getElementById('lastSync').textContent = new Date(data.lastSync).toLocaleString();
+        const date = new Date(data.lastSync);
+        document.getElementById('lastSync').textContent = date.toLocaleString();
     }
+    
+    // Display recent videos
+    displayRecentVideos(data.blockedVideos);
+    
+    // Display keywords
+    displayKeywords(data.keywords);
+}
+
+function displayRecentVideos(videos) {
+    const container = document.getElementById('recentVideos');
+    
+    if (!videos || Object.keys(videos).length === 0) {
+        container.innerHTML = '<div class="loading">No videos blocked yet</div>';
+        return;
+    }
+    
+    const videoList = Object.values(videos)
+        .sort((a, b) => (b.ts || 0) - (a.ts || 0))
+        .slice(0, 10);
+    
+    container.innerHTML = videoList.map(video => `
+        <div class="video-item">
+            <span class="video-title">${escapeHtml(video.title || 'Untitled')}</span>
+            <span class="video-reason">${video.reason || 'manual'}</span>
+        </div>
+    `).join('');
+}
+
+function displayKeywords(keywords) {
+    const container = document.getElementById('keywordList');
+    
+    if (!keywords || keywords.length === 0) {
+        container.innerHTML = '<div class="loading">No keywords added</div>';
+        return;
+    }
+    
+    container.innerHTML = `
+        <div class="keyword-tags">
+            ${keywords.map(k => `<span class="keyword-tag">${escapeHtml(k)}</span>`).join('')}
+        </div>
+    `;
+}
+
+function escapeHtml(text) {
+    if (!text) return '';
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
 }
 
 // ========== INITIALIZATION ==========
@@ -185,11 +235,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const userId = getUserIdFromUrl();
     
     if (userId) {
-        // We're on a dashboard page
         loadDashboardData();
+        
+        const previewEl = document.getElementById('previewUrl');
+        if (previewEl) {
+            previewEl.textContent = `https://diptodesign.github.io/cdashboard-v7/dashboard/${userId}`;
+        }
     } else {
-        // We're on login page
-        // Check if already logged in
         const token = localStorage.getItem('token');
         const savedUserId = localStorage.getItem('userId');
         if (token && savedUserId) {
