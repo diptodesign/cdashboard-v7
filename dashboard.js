@@ -1,89 +1,28 @@
 // ============================================
-// DASHBOARD.JS - COMPLETE LOGIC
+// dashboard.js - COMPLETE WORKING VERSION
 // ============================================
 
-// Configuration - UPDATE THIS WITH YOUR RENDER URL
-const CONFIG = {
-    API_URL: 'https://clify-api.onrender.com', // Your Render API
-    APP_NAME: 'Clify Cloud',
-    VERSION: '7.0.0'
-};
+const API_URL = 'https://clify-api.onrender.com';
 
-// ==================== UTILITY FUNCTIONS ====================
+// ========== URL HANDLING ==========
 function getUserIdFromUrl() {
+    // Check for userId in different URL formats
     const path = window.location.pathname;
-    const match = path.match(/\/dashboard\/([^\/]+)/);
-    return match ? match[1] : null;
-}
-
-function saveAuth(token, userId, username) {
-    localStorage.setItem('clify_token', token);
-    localStorage.setItem('clify_userId', userId);
-    localStorage.setItem('clify_username', username);
-}
-
-function clearAuth() {
-    localStorage.removeItem('clify_token');
-    localStorage.removeItem('clify_userId');
-    localStorage.removeItem('clify_username');
-}
-
-function escapeHtml(text) {
-    if (!text) return '';
-    const div = document.createElement('div');
-    div.textContent = text;
-    return div.innerHTML;
-}
-
-function formatDate(timestamp) {
-    if (!timestamp) return 'Never';
-    const date = new Date(timestamp);
-    return date.toLocaleString();
-}
-
-// ==================== API CONNECTION ====================
-async function checkAPI() {
-    const statusDot = document.getElementById('statusDot');
-    const statusText = document.getElementById('statusText');
+    const params = new URLSearchParams(window.location.search);
     
-    try {
-        const response = await fetch(`${CONFIG.API_URL}/api/health`);
-        const data = await response.json();
-        
-        if (data.database && data.database.state === 1) {
-            statusDot.className = 'dot connected';
-            statusText.textContent = 'Connected to cloud';
-            return true;
-        } else {
-            statusDot.className = 'dot disconnected';
-            statusText.textContent = 'Cloud service unavailable';
-            return false;
-        }
-    } catch (error) {
-        statusDot.className = 'dot disconnected';
-        statusText.textContent = 'Cannot connect to cloud';
-        return false;
+    // Format 1: /dashboard/USERID
+    if (path.includes('/dashboard/')) {
+        return path.split('/dashboard/')[1].split('/')[0].split('?')[0];
     }
-}
-
-// ==================== EXTENSION DETECTION ====================
-function checkExtension() {
-    const extDot = document.getElementById('extDot');
-    const extText = document.getElementById('extText');
     
-    // Check if running in Chrome extension context
-    if (window.chrome && chrome.runtime && chrome.runtime.id) {
-        extDot.className = 'ext-dot connected';
-        extText.textContent = 'Clify extension detected';
-        return true;
-    } else {
-        extDot.className = 'ext-dot disconnected';
-        extText.textHTML = 'Extension not detected - using web mode';
-        return false;
-    }
+    // Format 2: ?user=USERID
+    const userId = params.get('user');
+    if (userId) return userId;
+    
+    return null;
 }
 
-// ==================== AUTH FUNCTIONS ====================
+// ========== AUTH FUNCTIONS ==========
 function showTab(tabName) {
     document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
     document.querySelectorAll('.form').forEach(f => f.classList.remove('active'));
@@ -110,7 +49,7 @@ async function login() {
     }
     
     try {
-        const response = await fetch(`${CONFIG.API_URL}/api/login`, {
+        const response = await fetch(`${API_URL}/api/login`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ username, password })
@@ -119,14 +58,15 @@ async function login() {
         const data = await response.json();
         
         if (data.success) {
-            saveAuth(data.token, data.userId, data.username);
+            localStorage.setItem('clify_token', data.token);
+            localStorage.setItem('clify_userId', data.userId);
+            localStorage.setItem('clify_username', data.username);
             
-            // Show success and redirect
             errorEl.style.color = '#4caf50';
             errorEl.textContent = 'Login successful! Redirecting...';
             
             setTimeout(() => {
-                window.location.href = `dashboard/${data.userId}`;
+                window.location.href = `/cdashboard-v7/dashboard/${data.userId}`;
             }, 1500);
         } else {
             errorEl.textContent = data.error || 'Login failed';
@@ -162,7 +102,7 @@ async function register() {
     }
     
     try {
-        const response = await fetch(`${CONFIG.API_URL}/api/register`, {
+        const response = await fetch(`${API_URL}/api/register`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ username, password })
@@ -171,11 +111,13 @@ async function register() {
         const data = await response.json();
         
         if (data.success) {
-            successEl.textContent = 'Account created successfully! Redirecting...';
-            saveAuth(data.token, data.userId, data.username);
+            successEl.textContent = 'Account created! Redirecting...';
+            localStorage.setItem('clify_token', data.token);
+            localStorage.setItem('clify_userId', data.userId);
+            localStorage.setItem('clify_username', data.username);
             
             setTimeout(() => {
-                window.location.href = `dashboard/${data.userId}`;
+                window.location.href = `/cdashboard-v7/dashboard/${data.userId}`;
             }, 1500);
         } else {
             errorEl.textContent = data.error || 'Registration failed';
@@ -185,49 +127,48 @@ async function register() {
     }
 }
 
-// ==================== DASHBOARD FUNCTIONS ====================
+function logout() {
+    localStorage.removeItem('clify_token');
+    localStorage.removeItem('clify_userId');
+    localStorage.removeItem('clify_username');
+    window.location.href = '/cdashboard-v7/';
+}
+
+// ========== DASHBOARD FUNCTIONS ==========
 async function loadDashboardData() {
     const userId = getUserIdFromUrl();
     const token = localStorage.getItem('clify_token');
     const username = localStorage.getItem('clify_username');
     
-    if (!token || !userId) {
+    if (!userId) {
         window.location.href = '/cdashboard-v7/';
         return;
     }
     
-    // Set user info
-    document.getElementById('displayName').textContent = username;
-    document.getElementById('username').textContent = username;
-    document.getElementById('loginHint').textContent = username;
+    // Update UI with user info
+    document.getElementById('displayName').textContent = username || 'User';
+    document.getElementById('username').textContent = username || 'User';
     
     // Set dashboard URL
     const dashboardUrl = window.location.href;
     document.getElementById('dashboardUrl').textContent = dashboardUrl;
     
-    // Check extension
-    checkExtension();
-    
     // Load data from API
     try {
-        const response = await fetch(`${CONFIG.API_URL}/api/data/${userId}`, {
-            headers: {
-                'Authorization': `Bearer ${token}`
-            }
+        const response = await fetch(`${API_URL}/api/data/${userId}`, {
+            headers: token ? { 'Authorization': `Bearer ${token}` } : {}
         });
         
         const result = await response.json();
         
         if (result.success && result.data) {
             displayDashboardData(result.data);
-            updateConnectionStatus('connected', formatDate(result.data.lastSync));
         } else {
-            updateConnectionStatus('error', 'Failed to load data');
+            document.getElementById('recentVideos').innerHTML = '<div class="loading">No data found</div>';
         }
     } catch (error) {
         console.error('Failed to load data:', error);
-        updateConnectionStatus('error', 'Connection failed');
-        document.getElementById('recentVideos').innerHTML = '<div class="error">Failed to load data from cloud</div>';
+        document.getElementById('recentVideos').innerHTML = '<div class="loading">Failed to load data</div>';
     }
 }
 
@@ -235,7 +176,7 @@ function displayDashboardData(data) {
     // Update stats
     const videos = Object.keys(data.blockedVideos || {}).length;
     const keywords = (data.keywords || []).length;
-    const shorts = Object.values(data.blockedVideos || {}).filter(v => v.reason === 'shorts').length;
+    const shorts = Object.values(data.blockedVideos || {}).filter(v => v?.reason === 'shorts').length;
     
     document.getElementById('totalBlocks').textContent = videos;
     document.getElementById('keywordsCount').textContent = keywords;
@@ -243,21 +184,22 @@ function displayDashboardData(data) {
     document.getElementById('videoCount').textContent = videos;
     document.getElementById('keywordCount').textContent = keywords;
     
+    if (data.lastSync) {
+        document.getElementById('lastSync').textContent = new Date(data.lastSync).toLocaleDateString();
+    }
+    
     // Display recent videos
     displayRecentVideos(data.blockedVideos);
     
     // Display keywords
     displayKeywords(data.keywords);
-    
-    // Display raw data
-    document.getElementById('rawData').textContent = JSON.stringify(data, null, 2);
 }
 
 function displayRecentVideos(videos) {
     const container = document.getElementById('recentVideos');
     
     if (!videos || Object.keys(videos).length === 0) {
-        container.innerHTML = '<div class="loading">No videos blocked yet. Start using Clify extension!</div>';
+        container.innerHTML = '<div class="loading">No videos blocked yet</div>';
         return;
     }
     
@@ -278,7 +220,7 @@ function displayKeywords(keywords) {
     const container = document.getElementById('keywordList');
     
     if (!keywords || keywords.length === 0) {
-        container.innerHTML = '<div class="loading">No keywords added. Add keywords in extension!</div>';
+        container.innerHTML = '<div class="loading">No keywords added</div>';
         return;
     }
     
@@ -289,27 +231,6 @@ function displayKeywords(keywords) {
     `;
 }
 
-function updateConnectionStatus(status, lastSync) {
-    const syncDot = document.getElementById('syncDot');
-    const syncText = document.getElementById('syncText');
-    const lastSyncEl = document.getElementById('lastDataSync');
-    const apiStatus = document.getElementById('apiStatus');
-    
-    if (status === 'connected') {
-        syncDot.className = 'sync-dot connected';
-        syncText.textContent = 'Synced';
-        apiStatus.textContent = 'Connected';
-    } else {
-        syncDot.className = 'sync-dot disconnected';
-        syncText.textContent = 'Sync Pending';
-        apiStatus.textContent = 'Connected';
-    }
-    
-    if (lastSyncEl) {
-        lastSyncEl.textContent = lastSync || 'Never';
-    }
-}
-
 function copyUrl() {
     const url = document.getElementById('dashboardUrl').textContent;
     navigator.clipboard.writeText(url).then(() => {
@@ -317,34 +238,33 @@ function copyUrl() {
     });
 }
 
-function logout() {
-    clearAuth();
-    window.location.href = '/cdashboard-v7/';
+function escapeHtml(text) {
+    if (!text) return '';
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
 }
 
-// ==================== INITIALIZATION ====================
+// ========== INITIALIZATION ==========
 document.addEventListener('DOMContentLoaded', () => {
     const userId = getUserIdFromUrl();
     
     if (userId) {
         // We're on a dashboard page
         loadDashboardData();
-    } else {
-        // We're on login page
-        checkAPI();
-        checkExtension();
         
-        // Update preview URL
+        // Update preview URL on login page if it exists
         const previewEl = document.getElementById('previewUrl');
         if (previewEl) {
-            previewEl.textContent = `https://diptodesign.github.io/cdashboard-v7/dashboard/YOUR-USER-ID`;
+            previewEl.textContent = `https://diptodesign.github.io/cdashboard-v7/dashboard/${userId}`;
         }
-        
+    } else {
+        // We're on login page
         // Check if already logged in
         const token = localStorage.getItem('clify_token');
         const savedUserId = localStorage.getItem('clify_userId');
         if (token && savedUserId) {
-            window.location.href = `dashboard/${savedUserId}`;
+            window.location.href = `/cdashboard-v7/dashboard/${savedUserId}`;
         }
     }
 });
