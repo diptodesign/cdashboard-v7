@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clify Cloud - Login</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Logo -->
+        <div class="logo">
+            <div class="logo-icon">C</div>
+            <h1>Clify Cloud</h1>
+            <p>Your YouTube blocker, synchronized everywhere</p>
+        </div>
+        
+        <!-- Connection Status -->
+        <div class="connection-status" id="connectionStatus">
+            <span class="dot" id="statusDot"></span>
+            <span id="statusText">Checking connection to cloud...</span>
+        </div>
+        
+        <!-- Extension Status -->
+        <div class="extension-status" id="extensionStatus">
+            <span class="ext-dot" id="extDot"></span>
+            <span id="extText">Checking Clify extension...</span>
+        </div>
+        
+        <!-- Tab Navigation -->
+        <div class="tabs">
+            <button class="tab active" onclick="showTab('login')">Login</button>
+            <button class="tab" onclick="showTab('register')">Create Account</button>
+        </div>
+        
+        <!-- Login Form -->
+        <div id="loginForm" class="form active">
+            <h2>Welcome Back</h2>
+            <p class="form-subtitle">Login to access your dashboard</p>
+            
+            <div class="form-group">
+                <label>Username</label>
+                <input type="text" id="loginUsername" placeholder="Enter your username">
+            </div>
+            
+            <div class="form-group">
+                <label>Password</label>
+                <input type="password" id="loginPassword" placeholder="Enter your password">
+            </div>
+            
+            <button onclick="login()" class="btn-primary">
+                <span>Login</span>
+                <i class="arrow">→</i>
+            </button>
+            
+            <div id="loginError" class="error-message"></div>
+        </div>
+        
+        <!-- Register Form -->
+        <div id="registerForm" class="form">
+            <h2>Create Account</h2>
+            <p class="form-subtitle">Get your personal dashboard URL</p>
+            
+            <div class="form-group">
+                <label>Username</label>
+                <input type="text" id="regUsername" placeholder="Choose a username">
+            </div>
+            
+            <div class="form-group">
+                <label>Password (min 6 characters)</label>
+                <input type="password" id="regPassword" placeholder="Choose a password">
+            </div>
+            
+            <div class="form-group">
+                <label>Confirm Password</label>
+                <input type="password" id="regConfirm" placeholder="Confirm your password">
+            </div>
+            
+            <button onclick="register()" class="btn-primary">
+                <span>Create Account</span>
+                <i class="arrow">→</i>
+            </button>
+            
+            <div id="registerError" class="error-message"></div>
+            <div id="registerSuccess" class="success-message"></div>
+        </div>
+        
+        <!-- Info Box -->
+        <div class="info-box">
+            <div class="info-icon">ℹ️</div>
+            <div class="info-content">
+                <strong>Your personal dashboard URL will be:</strong>
+                <code id="previewUrl">https://diptodesign.github.io/cdashboard-v7/dashboard/YOUR-USER-ID</code>
+                <p class="info-note">After login, you'll get your unique dashboard link</p>
+            </div>
+        </div>
+        
+        <!-- Sync Instructions -->
+        <div class="sync-instructions">
+            <h3>📱 Connect with Clify Extension</h3>
+            <ol>
+                <li>Install Clify extension from Chrome Web Store</li>
+                <li>Click the Clify icon in Chrome toolbar</li>
+                <li>Go to Settings → Cloud Sync</li>
+                <li>Enter your username and password</li>
+                <li>Your blocks will sync automatically!</li>
+            </ol>
+        </div>
+        
+        <!-- Footer -->
+        <div class="footer">
+            <p>⚡ Powered by Render.com + MongoDB Atlas</p>
+            <p>© 2026 Clify - Dipto Design Studio</p>
+            <p class="small">Extension Version: 7.0.0 | API: Connected</p>
+        </div>
+    </div>
+    
+    <script src="dashboard.js"></script>
+</body>
+</html>

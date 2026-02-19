@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Clify Dashboard</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Header -->
+        <header class="dashboard-header">
+            <div class="logo">
+                <div class="logo-icon">C</div>
+                <div class="logo-text">
+                    <h2>Clify Cloud</h2>
+                    <span class="badge">v7.0.0</span>
+                </div>
+            </div>
+            
+            <div class="header-actions">
+                <div class="sync-status" id="syncStatus">
+                    <span class="sync-dot" id="syncDot"></span>
+                    <span id="syncText">Synced</span>
+                </div>
+                <div class="user-menu">
+                    <span class="username" id="username"></span>
+                    <button onclick="logout()" class="logout-btn">Logout</button>
+                </div>
+            </div>
+        </header>
+        
+        <!-- Main Content -->
+        <main class="dashboard-main">
+            <!-- Welcome Card -->
+            <div class="welcome-card">
+                <h1>Welcome back, <span id="displayName"></span>! 👋</h1>
+                <p>Your Clify extension data is synced to the cloud</p>
+            </div>
+            
+            <!-- Stats Grid -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon">📊</div>
+                    <div class="stat-content">
+                        <div class="stat-value" id="totalBlocks">0</div>
+                        <div class="stat-label">Total Blocked Videos</div>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon">🔑</div>
+                    <div class="stat-content">
+                        <div class="stat-value" id="keywordsCount">0</div>
+                        <div class="stat-label">Active Keywords</div>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon">📼</div>
+                    <div class="stat-content">
+                        <div class="stat-value" id="shortsCount">0</div>
+                        <div class="stat-label">Shorts Blocked</div>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon">🔄</div>
+                    <div class="stat-content">
+                        <div class="stat-value" id="lastSync">-</div>
+                        <div class="stat-label">Last Sync</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Connection Info -->
+            <div class="info-card">
+                <h3>🔗 Extension Connection</h3>
+                <div class="connection-details">
+                    <div class="detail-item">
+                        <span class="detail-label">Extension Status:</span>
+                        <span class="detail-value" id="extConnectionStatus">Checking...</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Cloud API:</span>
+                        <span class="detail-value" id="apiStatus">Connected</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Last Data Sync:</span>
+                        <span class="detail-value" id="lastDataSync">Never</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- User Info Card -->
+            <div class="info-card">
+                <h3>Your Dashboard URL</h3>
+                <div class="url-container">
+                    <code id="dashboardUrl" class="dashboard-url"></code>
+                    <button onclick="copyUrl()" class="copy-btn">Copy</button>
+                </div>
+                <p class="url-note">Use this URL to access your dashboard from anywhere</p>
+            </div>
+            
+            <!-- Data Sections -->
+            <div class="data-sections">
+                <!-- Blocked Videos -->
+                <div class="data-section">
+                    <div class="section-header">
+                        <h3>📼 Recently Blocked Videos</h3>
+                        <span class="badge" id="videoCount">0</span>
+                    </div>
+                    <div class="section-content" id="recentVideos">
+                        <div class="loading">Loading videos from cloud...</div>
+                    </div>
+                </div>
+                
+                <!-- Keywords -->
+                <div class="data-section">
+                    <div class="section-header">
+                        <h3>🔑 Your Keywords</h3>
+                        <span class="badge" id="keywordCount">0</span>
+                    </div>
+                    <div class="section-content" id="keywordList">
+                        <div class="loading">Loading keywords from cloud...</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Extension Instructions -->
+            <div class="extension-card">
+                <h3>📱 Sync Your Extension</h3>
+                <div class="steps">
+                    <div class="step">
+                        <span class="step-number">1</span>
+                        <span class="step-text">Open Clify extension in Chrome</span>
+                    </div>
+                    <div class="step">
+                        <span class="step-number">2</span>
+                        <span class="step-text">Click "Cloud Sync" in settings</span>
+                    </div>
+                    <div class="step">
+                        <span class="step-number">3</span>
+                        <span class="step-text">Login with: <strong id="loginHint"></strong></span>
+                    </div>
+                    <div class="step">
+                        <span class="step-number">4</span>
+                        <span class="step-text">Your videos will sync automatically!</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Raw Data (for debugging) -->
+            <div class="raw-data">
+                <details>
+                    <summary>📋 View Raw Data (for developers)</summary>
+                    <pre id="rawData"></pre>
+                </details>
+            </div>
+        </main>
+        
+        <!-- Footer -->
+        <footer class="dashboard-footer">
+            <p>© 2026 Clify - Your data is synced via Render.com + MongoDB</p>
+            <p class="small">Extension ID: <span id="extensionId">Not detected</span></p>
+        </footer>
+    </div>
+    
+    <script src="dashboard.js"></script>
+</body>
+</html>
